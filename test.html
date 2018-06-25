@@ -14,8 +14,11 @@
   <script>
         window.onload = function() {
           var eventsHandler;
-
+  
         eventsHandler = {
+          zoomEnabled: true
+        , controlIconsEnabled: true
+        , customEventsHandler:{
           haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
         , init: function(options) {
             var instance = options.instance
@@ -69,7 +72,8 @@
 
         , destroy: function(){
             this.hammer.destroy()
-          }      
+          }    
+        }  
       }
 
         var panZoom = window.panZoom = svgPanZoom('#mySVG', {
@@ -77,13 +81,13 @@
           controlIconsEnabled: true,
           fit: 1,
           center: 1
-        }, eventHandler);
+        }, eventsHandler);
 
         $(window).resize(function(){
           panZoom.resize();
           panZoom.fit();
           panZoom.center();
-        });
+        },  eventsHandler);
       };
 
     
