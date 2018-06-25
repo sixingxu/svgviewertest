@@ -14,7 +14,6 @@
   <script>
         window.onload = function() {
           var eventsHandler;
-          var svgElement = document.querySelector('#mySVG');
 
         eventsHandler = {
           haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
@@ -78,7 +77,7 @@
           controlIconsEnabled: true,
           fit: 1,
           center: 1
-        });
+        }, eventHandler);
 
         $(window).resize(function(){
           panZoom.resize();
