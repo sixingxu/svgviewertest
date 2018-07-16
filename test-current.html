@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SVG test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  <script src="svg-pan-zoom.js"></script>
+  <script src="hammer.js"></script>
+  <script src="jquery-1.11.1.min.js"></script>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+</head>
+<style>
+/*@import url(//fonts.googleapis.com/css?family=Averia+Serif+Libre);*/
+
+html *{
+  font-family:'Averia Serif Libre'!important;
+}
+
+.button{
+  background-color: #000000;
+  opacity:0.3;
+  border: none;
+  color: white;
+  text-align: center;
+  font-size:100%;
+  font-weight: bold;
+  cursor:pointer;
+  border-radius: 7px;
+  max-width:100%;
+}
+
+.button:hover{
+  opacity:0.5;
+}
+
+.button1{
+  max-width:100%;
+  height:auto;
+}
+
+</style>
+<body>
+  <br>
+   <div id = "original"></div>
+    <div id = "resized"></div>
+    <div id = "dif"></div>
+    <div id = "mouse"></div>
+  <div id="container" style="position:relative; width: 100%; height: auto; border:1px solid black; ">
+  <embed id="mySVG" type="image/svg+xml" width="100%" height="auto" src="testdrawing.svg"/>
+  <button class="button" id="move" style="position:absolute; left: 50px; top:50px;">kitty</button>
+  <button class="button button1" id="zoom-in" style="position:absolute; right: 70px; top:20px;">+</button>
+  <button class="button button1" id="zoom-out" style="position:absolute; right: 70px; top:80px;">-</button>
+  <button class="button" id="reset" style="position:absolute; right: 50px; top:50px;">RESET</button>
+  
+  <script>
+        //panzoom object
+        var panZoom;
+        var originWidth 
+        var originHeight 
+        var imgWidth
+        var imgHeight
+        var dif
+        var catRelX = 0.486;
+        var catRelY = 0.726;
+        var catX 
+        var catY 
+        //zoom value
+        var r
+        var bounded
+window.onload = function() {
+
+        //set customized controls
+         document.getElementById('zoom-in').addEventListener('click', function(ev){
+          ev.preventDefault()
+
+          panZoom.zoomIn()
+        });
+
+        document.getElementById('zoom-out').addEventListener('click', function(ev){
+          ev.preventDefault()
+
+          panZoom.zoomOut()
+        });
+
+        document.getElementById('reset').addEventListener('click', function(ev){
+          ev.preventDefault()
+
+          panZoom.resetZoom()
+        });
+
+        var eventsHandler;
+
+        eventsHandler = {
+          haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
+        , init: function(options) {
+            var instance = options.instance
+              , initialScale = 1
+              , pannedX = 0
+              , pannedY = 0
+
+            // Init Hammer
+            // Listen only for pointer and touch events
+            this.hammer = Hammer(options.svgElement, {
+              inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+            })
+
+            // Enable pinch
+            this.hammer.get('pinch').set({enable: true})
+
+            // Handle double tap
+            this.hammer.on('doubletap', function(ev){
+              instance.zoomIn()
+            })
+
+            // Handle pan
+            this.hammer.on('panstart panmove', function(ev){
+              // On pan start reset panned variables
+              if (ev.type === 'panstart') {
+                pannedX = 0
+                pannedY = 0
+              }
+
+              // Pan only the difference
+              instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
+              pannedX = ev.deltaX
+              pannedY = ev.deltaY
+            })
+
+            // Handle pinch
+            this.hammer.on('pinchstart pinchmove', function(ev){
+              // On pinch start remember initial zoom
+              if (ev.type === 'pinchstart') {
+                initialScale = instance.getZoom()
+                instance.zoom(initialScale * ev.scale)
+              }
+
+              instance.zoom(initialScale * ev.scale)
+
+            })
+
+            // Prevent moving the page on some devices when panning over SVG
+            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+          }
+
+        , destroy: function(){
+            this.hammer.destroy()
+          }
+        }
+
+        // Expose to window namespace for testing purposes
+        panZoom = window.panZoom = svgPanZoom('#mySVG', {
+          zoomEnabled: true
+        , controlIconsEnabled: false
+        , fit: 1
+        , center: 1
+        , maxZoom: 50
+        , customEventsHandler: eventsHandler
+        // ,onPan:function(){
+        //   console.log(panZoom.getPan());
+        // }
+        , onZoom:function(){
+          r = panZoom.getZoom()
+          var z = panZoom.getSizes().realZoom;
+          console.log(z)
+       }
+        });
+
+        bounded = document.getElementById("mySVG").getBoundingClientRect();
+        imgWidth = panZoom.getSizes().width;
+        imgHeight = panZoom.getSizes().height;
+        catX = imgWidth*catRelX;
+        catY = imgHeight*catRelY;
+        console.log(catX)
+
+        $(window).resize(function(){
+          panZoom.resize();
+          panZoom.fit();
+          panZoom.center();
+        });
+
+
+      };
+        
+
+      $(window).resize(function(){
+       resizeUpdate()
+          });
+
+      function resizeUpdate(){
+       bounded = document.getElementById("mySVG").getBoundingClientRect();
+       imgWidth = panZoom.getSizes().width;
+       imgHeight = panZoom.getSizes().height;
+       r = panZoom.getSizes().realZoom;
+       //document.getElementById("resized").innerHTML = imgWidth*(1+r)+", "+imgHeight*(1+r)
+       catX = imgWidth*catRelX;
+       catY = imgHeight*catRelY;
+      // document.getElementById("mouse").innerHTML = catX+", "+catY
+      }
+
+
+
+      // window.setInterval(function(){
+      // sizeUpdate();
+      // }, 5000);
+
+      // function sizeUpdateTwo(){
+      //   s = panZoom.getSizes()
+      //   p = panZoom.getZoom()
+      //   relativeX = s.width / 2 / (p.x + s.viewBox.width * s.realZoom)
+
+      //   // After resize
+      //   var s = instance.getSizes()
+      //   var p = instance.getPan()
+      //   var x = (s.width / 2 / relativeX) - s.viewBox.width * s.realZoom
+
+      // }
+
+
+      // function mousePOS(){
+      //   selectX = event.clientX;
+      //   selectY = event.clientY;
+      //   console.log(selectY);
+      //   document.getElementById("mouse").innerHTML = selectX + ", " + selectY
+      // }
+
+      // $("#container").on('click', mousePOS);
+
+        $("#move").on("click", function() {
+        var count = 0;
+        var countPan1 = 0;
+        var countPan2 = 0;
+        // for(i=1;i<30; ++i){
+        //   panZoom.zoomAtPoint(i,{x: 250, y: 488})
+        //   console.log(i)
+        // }
+        console.log("clicked")
+        catX = catX*r;
+        catY = catY*r;
+
+        var myTimer = setInterval(function(){
+          panZoom.zoomAtPointBy(1.005,{x: catX, y: catY})  
+          count = count +1
+          console.log(count)   
+          if (count == 600){
+          clearInterval(myTimer);
+          autoPan1();
+          }
+        }, 50)
+
+        function autoPan1(){
+          var panTimer1 = setInterval(function(){
+          panZoom.panBy({x:1, y: 1}) 
+          countPan1 = countPan1 +1
+          console.log(countPan1)   
+          if (countPan1 == 100){
+          clearInterval(panTimer1)   
+          autoPan2();
+      }
+        }, 50)
+          
+      }
+
+        function autoPan2(){
+          var panTimer2 = setInterval(function(){
+          panZoom.panBy({x:-1, y: -1}) 
+          countPan2 = countPan2 +1
+          console.log(countPan2)   
+          if (countPan2 == 100){
+          clearInterval(panTimer2)   
+          autoZoomOut()
+      }
+        }, 50)
+
+        }
+
+        var countZoomOut = 0;
+        function autoZoomOut(){
+          var zoomOutTimer = setInterval(function(){
+            panZoom.setZoomScaleSensitivity(0.005);
+            panZoom.zoomOut()
+            countZoomOut = countZoomOut +1
+            console.log(countZoomOut)
+            if(countZoomOut == 600){
+            clearInterval(zoomOutTimer)
+            panZoom.reset()
+          }
+            }, 100)
+
+
+
+        }
+
+     })
+
+      // window.onload = function(){
+      //   var options = {
+      //     zoomEnabled: true, 
+      //     controlIconsEnabled: true, 
+
+      //     customEventsHandler:{
+      //     haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel']
+      //   , init: function(options) {
+      //       var instance = options.instance
+      //         , initialScale = 1
+      //         , pannedX = 0
+      //         , pannedY = 0
+
+      //       // Init Hammer
+      //       // Listen only for pointer and touch events
+      //       this.hammer = Hammer(options.svgElement, {
+      //         inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+      //       })
+
+      //       // Enable pinch
+      //       this.hammer.get('pinch').set({enable: true})
+
+      //       // Handle double tap
+      //       this.hammer.on('doubletap', function(ev){
+      //         instance.zoomIn()
+      //       })
+
+      //       // Handle pan
+      //       this.hammer.on('panstart panmove', function(ev){
+      //         // On pan start reset panned variables
+      //         if (ev.type === 'panstart') {
+      //           pannedX = 0
+      //           pannedY = 0
+      //         }
+
+      //         // Pan only the difference
+      //         instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY})
+      //         pannedX = ev.deltaX
+      //         pannedY = ev.deltaY
+      //       })
+
+      //       // Handle pinch
+      //       this.hammer.on('pinchstart pinchmove', function(ev){
+      //         // On pinch start remember initial zoom
+      //         if (ev.type === 'pinchstart') {
+      //           initialScale = instance.getZoom()
+      //           instance.zoom(initialScale * ev.scale)
+      //         }
+
+      //         instance.zoom(initialScale * ev.scale)
+
+      //       })
+
+      //       // Prevent moving the page on some devices when panning over SVG
+      //       options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+      //     }
+
+      //   , destroy: function(){
+      //       this.hammer.destroy()
+      //     }    
+      //   }
+      // }
+
+      //   var panZoom = window.panZoom = svgPanZoom('#mySVG', {
+      //     zoomEnabled: true,
+      //     controlIconsEnabled: true,
+      //     customEventsHandler: options,
+      //     fit: 1,
+      //     center: 1,
+      //     maxZoom: 100,
+      //   });
+
+
+      // }
+
+    
+    </script>
+  </div>
+
+</body>
+</html>
