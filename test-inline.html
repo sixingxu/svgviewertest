@@ -3,13 +3,24 @@
 <head>
   <title>SVG test</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1">
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
   <script src="svg-pan-zoom.js"></script>
   <script src="hammer.js"></script>
   <script src="jquery-1.11.1.min.js"></script>
 </head>
 <style>
-
+/* portrait */
+@media screen and (orientation:portrait) {
+    #mySVG{
+        position:fixed;
+    }
+}
+/* landscape */
+@media screen and (orientation:landscape) {
+    #mySVG{
+        position:fixed;
+    }
+}
 
 @font-face {
   font-family: 'Averia';/* IE9 Compat Modes */
@@ -24,7 +35,6 @@ body,html{
   margin:0;
   padding:0;
   border:none;
-  position: relative;
 }
 
 .button{
