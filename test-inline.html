@@ -175,9 +175,6 @@ body,html{
       }
       //END OF window.onload
 
-      window.addEventListener('resize',function() {
-    svg.setAttribute("x",0);
-});
 
     //   function doOnOrientationChange() {
     // switch(window.orientation) {  
@@ -312,6 +309,9 @@ body,html{
        imgWidth = panZoom.getSizes().width;
        imgHeight = panZoom.getSizes().height;
        // document.getElementById("resize").innerHTML = "resized: "+imgWidth+", "+imgHeight
+          panZoom.resize();
+          panZoom.fit();
+          panZoom.center();
       }
 
 
