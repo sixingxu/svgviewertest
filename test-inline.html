@@ -127,7 +127,6 @@ body {
 
       window.onload = function() {
 
-
         //set customized controls
          document.getElementById('zoom-in').addEventListener('click', function(ev){
           ev.preventDefault()
@@ -310,19 +309,19 @@ body {
 
       }  
 
-      $(window).resize(function(){
-       resizeUpdate();
-          });
+      // $(window).resize(function(){
+      //  resizeUpdate();
+      //     });
 
-      function resizeUpdate(){
-       bounded = document.getElementById("mySVG").getBoundingClientRect();
-       imgWidth = panZoom.getSizes().width;
-       imgHeight = panZoom.getSizes().height;
-       // document.getElementById("resize").innerHTML = "resized: "+imgWidth+", "+imgHeight
-          panZoom.resize();
-          panZoom.fit();
-          panZoom.center();
-      }
+      // function resizeUpdate(){
+      //  bounded = document.getElementById("mySVG").getBoundingClientRect();
+      //  imgWidth = panZoom.getSizes().width;
+      //  imgHeight = panZoom.getSizes().height;
+      //  // document.getElementById("resize").innerHTML = "resized: "+imgWidth+", "+imgHeight
+      //     panZoom.resize();
+      //     panZoom.fit();
+      //     panZoom.center();
+      // }
 
 
       //get mouse position when clicked
