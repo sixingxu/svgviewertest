@@ -57,10 +57,12 @@ body,html{
 
 #mySVG {
   position: absolute; 
+  display: block
   height: 100%; 
   width: 100%; 
   left: 0; 
   top:0;
+  margin:auto;
 }
 
 
@@ -281,6 +283,7 @@ body,html{
         , center: 1
         , minZoom: 1
         , maxZoom: 100
+        , zoomScaleSensitivity: 0.2
         , customEventsHandler: eventsHandler
         , beforePan: beforePan
         , onZoom:function(){
